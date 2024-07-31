@@ -19,6 +19,8 @@ yarn dev
 pnpm dev
 # or
 bun dev
+
+```
 <p align="center">
   <img src="image/home.png" alt="Home">
 </p>
@@ -31,4 +33,3 @@ bun dev
 <p align="center">
   <img src="image/search.png" alt="Search">
 </p>
-```
