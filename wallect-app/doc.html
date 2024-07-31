@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Documentation Page</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 70%;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      pre {
+        background-color: #f1f1f1;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        position: relative;
+      }
+      code {
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 16px;
+      }
+      .copy-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .copy-button:hover {
+        background-color: #0056b3;
+      }
+      .section {
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+       <h1>Please check video first</h1>
+      <a href="https://drive.google.com/file/d/1jLqJNlP-udCF8eksC3UWcEJXShIHyPM-/view?usp=sharing" target="_blank" rel="noopener noreferrer">Video link</a>
+      <p></p>
+      <a href="https://walletconnect.com/" target="_blank" rel="noopener noreferrer">Official website</a>
+      <h1>Installation Next.js</h1>
+      <div class="section">
+        <p>To install the required packages, run the following command:</p>
+        <pre><code id="install-snippet">npx create-next-app@latest </code>
+            <button class="copy-button" onclick="copyToClipboard('install-snippet')">Copy</button>
+        </pre>
+      </div>
+      <h1>Installation</h1>
+      <div class="section">
+        <p>To install the required packages, run the following command:</p>
+        <pre><code id="install-snippet">npm install @web3modal/wagmi wagmi viem @tanstack/react-query</code>
+            <button class="copy-button" onclick="copyToClipboard('install-snippet')">Copy</button>
+        </pre>
+      </div>
+
+
+      <div class="section">
+        <p><h1>Wagmi configuration:</h1></p>
+        Create a new file for your Wagmi configuration, since we are going to be
+        calling this function on the client and the server it cannot live inside
+        a file with the 'use client' directive. For this example we will create
+        a file called config/index.jsx outside our app directory and set up the
+        following configuration
+        <pre><code id="config-snippet">import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
+import { authConnector } from "@web3modal/wagmi";
+
+import { cookieStorage, createStorage } from "wagmi";
+import { mainnet, arbitrum, base, sepolia } from "wagmi/chains";
+
+// Get projectId from https://cloud.walletconnect.com
+export const projectId = "6b633f37cf5d3b13261f9420b524a946";
+// export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
+
+if (!projectId) throw new Error("Project ID is not defined");
+
+export const metadata = {
+  name: "appkit-app",
+  description: "Wallet Connect App",
+  url: "https://web3modal.com", // origin must match your domain & subdomain
+  icons: ["https://avatars.githubusercontent.com/u/37784886"]
+};
+
+// Create wagmiConfig
+const chains = [mainnet, arbitrum, base, sepolia];
+export const config = defaultWagmiConfig({
+  chains,
+  projectId,
+  metadata,
+  auth: {
+    email: true, // default to true
+    socials: ["github", "google", "x", "discord", "apple"],
+    showWallets: true, // default to true
+    walletFeatures: true // default to true
+  },
+  ssr: true,
+  storage: createStorage({
+    storage: cookieStorage
+  })
+});</code>
+            <button class="copy-button" onclick="copyToClipboard('config-snippet')">Copy</button>
+        </pre>
+      </div>
+           
+      <!-- section -3 -->
+      <div class="section">
+        <p><h1>Context Provider:</h1></p>
+        Let's create now a context provider that will wrap our application and initialized Web3Modal (createWeb3Modal needs to be called inside a React Client Component file).
+
+In this example we will create a file called context/index.jsx outside our app directory and set up the following configuration
+        <pre><code id="config-snippet">"use client";
+
+import React, { ReactNode } from "react";
+import { config, projectId, metadata } from "@/config";
+
+import { createWeb3Modal } from "@web3modal/wagmi/react";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+import { State, WagmiProvider } from "wagmi";
+
+// Setup queryClient
+const queryClient = new QueryClient();
+
+if (!projectId) throw new Error("Project ID is not defined");
+
+// Create modal
+createWeb3Modal({
+  metadata,
+  wagmiConfig: config,
+  projectId,
+  enableAnalytics: true, // Optional - defaults to your Cloud configuration
+  enableOnramp: true, // Optional - false as default
+  themeMode: "light", // By default - set to user system settings
+  themeVariables: {
+    "--w3m-font-family": "Verdana", // Base font family
+    // "--w3m-color-mix": "#0137b6", // The color that blends in with the default colors
+    // "--w3m-color-mix-strength": 60, // The percentage on how much "--w3m-color-mix" should blend in
+    // "--w3m-accent": "#feea35", // Color used for buttons, icons, labels, etc.
+    // "--w3m-font-size-master": "10px",
+    "--w3m-border-radius-master": "2px",
+    "--w3m-z-index": 1
+  }
+});
+
+export default function Web3ModalProvider({ children, initialState }) {
+  return (
+    <WagmiProvider config={config} initialState={initialState}>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </WagmiProvider>
+  );
+}</code>
+            <button class="copy-button" onclick="copyToClipboard('config-snippet')">Copy</button>
+        </pre>
+      </div>
+      <!-- section -4 -->
+    <div class="section">
+        <p><h1>Layout:</h1></p>
+        Next, in our app/layout.jsx file, we will import our Web3ModalProvider component and call the Wagmi's function cookieToInitialState.
+
+The initialState returned by cookieToInitialState, contains the optimistic values that will populate the Wagmi's store both on the server and client.
+        <pre><code id="config-snippet">import { Inter } from "next/font/google";
+import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"] });
+
+import { headers } from "next/headers"; // added
+import { cookieToInitialState } from "wagmi"; // added
+import { config } from "@/config"; // added
+import Web3ModalProvider from "@/context"; // added
+
+export const metadata = {
+  title: "AppKit Example App",
+  description: "Powered by WalletConnect"
+};
+
+export default function RootLayout({
+  children
+}) {
+  const initialState = cookieToInitialState(config, headers().get("cookie")); // added
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <Web3ModalProvider initialState={initialState}>{children}</Web3ModalProvider>
+      </body>
+    </html>
+  );
+}</code>
+            <button class="copy-button" onclick="copyToClipboard('config-snippet')">Copy</button>
+        </pre>
+      </div>
+
+            <!-- section -5 -->
+    <div class="section">
+        <p><h1>if you want you use custom button component :</h1></p>
+        Next, in our src/components/CustomButton.jsx file
+        <pre><code id="config-snippet">"use client";
+
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useAccount, useDisconnect } from "wagmi";
+
+export default function CustomButton() {
+  const { open } = useWeb3Modal();
+  const { isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+
+  const baseStyle =
+    "px-4 py-2 font-bold text-white rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-1 active:translate-y-0 focus:outline-none";
+
+  if (isConnected)
+    return (
+      <button
+        onClick={() => disconnect()}
+        className={`${baseStyle} bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600`}
+      >
+        <span className="mr-2 text-xl">🔓</span>
+        Disconnect
+      </button>
+    );
+  return (
+    <button
+      onClick={() => open()}
+      className={`${baseStyle} bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600`}
+    >
+      <span className="mr-2 text-xl">👛</span>
+      Connect Wallet
+    </button>
+  );
+}</code>
+            <button class="copy-button" onclick="copyToClipboard('config-snippet')">Copy</button>
+        </pre>
+      </div>
+
+            <!-- section -6 -->
+    <div class="section">
+        <p><h1>Main page:</h1></p>
+
+"use client";
+
+import CustomButton from "@/components/CustomButton";
+import { useAccount } from "wagmi";
+
+export default function Home() {
+  const { isConnected } = useAccount();
+
+  return (
+    <main className="min-h-screen px-8 py-0 flex flex-col items-center">
+
+      <div className="flex justify-center items-center flex-1">
+        <CustomButton />
+      </div>
+    </main>
+  );
+}
+
+    </code>
+            <button class="copy-button" onclick="copyToClipboard('config-snippet')">Copy</button>
+        </pre>
+      </div>
+    </div>
+
+    <script>
+      function copyToClipboard(id) {
+        const codeSnippet = document.getElementById(id).textContent;
+        const textarea = document.createElement("textarea");
+        textarea.value = codeSnippet;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        alert("Code copied to clipboard!");
+      }
+    </script>
+  </body>
+</html>
