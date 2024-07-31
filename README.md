@@ -25,11 +25,12 @@ bun dev
   <img src="image/home.png" alt="Home">
 </p>
 <p align="center">
-  <img src="image/metamask.png" alt="MetaMask">
+  <img src="image/wallermodal.png" alt="Wallet Modal">
 </p>
 <p align="center">
-  <img src="image/wallet-modal.png" alt="Wallet Modal">
+  <img src="image/metamask.png" alt="MetaMask">
 </p>
+
 <p align="center">
   <img src="image/search.png" alt="Search">
 </p>
