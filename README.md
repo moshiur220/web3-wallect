@@ -4,7 +4,7 @@
 
 # AppKit
 
-With a layered feature stack spanning onboarding to transactions, messaging and more, AppKit enables apps to build powerful top-to-bottom web3 experiences made to last, all through one seamless integration.
+WalletConnect is a platform that provides developers with tools to create seamless, secure, and scalable user experiences for Web3 applications and wallets. It offers a suite of SDKs and APIs, including AppKit for building powerful apps and WalletKit for enhancing wallet experiences. The platform facilitates easy integration with over 6,000 apps and 150+ blockchains, aiming to enhance digital ownership through intuitive and modular solutions. WalletConnect also provides analytics and UX insights to help developers optimize their products.
 
 ## Getting Started
 
